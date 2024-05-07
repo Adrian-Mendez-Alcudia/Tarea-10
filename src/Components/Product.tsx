@@ -16,7 +16,11 @@ const Product: React.FC =() => {
         title: 'Precio',
         dataIndex: 'precio_unitario',
         key: 'precio_unitario',
+      },
+      {
+        
       }
+      
     ];
   
     useEffect(() => {
@@ -33,7 +37,7 @@ const Product: React.FC =() => {
     }, []);
   
     
-    
+
     return (
     <Table dataSource={products} columns={columns} />
     );
