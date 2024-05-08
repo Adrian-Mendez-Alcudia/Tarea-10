@@ -11,3 +11,4 @@ export interface Product {
     FechaEliminado?: Date | null;
     fk_EliminadoPor?: number | null;
   }
+  export default Product;

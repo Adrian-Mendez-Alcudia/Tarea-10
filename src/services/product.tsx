@@ -1,5 +1,5 @@
-import { Product } from "../models/product";
 import supabase from "../utils/supabase";
+import { Product } from "../models/product";
 
 
 export const getProducts = async (): Promise<Product[]> => {
