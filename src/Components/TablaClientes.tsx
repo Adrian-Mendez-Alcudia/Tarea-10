@@ -24,8 +24,8 @@ const TablaClientes: React.FC = () => {
     },
     {
         title: 'fecha_nacimiento',
-        dataIndex: 'fecha_nacimiento',
-        key: 'fecha_nacimiento',
+        dataIndex: 'fecha_de_nacimiento',
+        key: 'fecha_de_nacimiento',
     },
     {
         title: 'fecha_creacion',
