@@ -72,11 +72,11 @@ const TablaUsuarios: React.FC = () => {
       <Table dataSource={usuarios} columns={columns} />
       <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
         <Form>
-          <Form.Item label="nombre de usuario"
+          <Form.Item label="Nombre de usuario"
           name="nombre"> 
             <Input/>
           </Form.Item>
-          <Form.Item label="apellido de usuario"
+          <Form.Item label="Apellido de usuario"
           name="apellido"> 
             <Input/>
           </Form.Item>
