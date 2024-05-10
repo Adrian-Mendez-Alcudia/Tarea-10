@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { getSesionProducto } from '../services/sesionesProductos';
 import { SesionProducto } from '../models/sesionesProductos';
-import { Table } from "antd";
+import { Button, Drawer, Form, Input, Table } from "antd";
+import DrawerFooter from './DrawerFooter';
 
 const TablaSesionesProductos: React.FC = () => {
+  const [open, setOpen] = useState(false);
   const [sesionesproductos, setSesionProducto] = useState<SesionProducto[]>([]);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
 
   const columns = [
     {
@@ -14,7 +24,7 @@ const TablaSesionesProductos: React.FC = () => {
     },
     {
         title: 'fk_producto',
-        dataIndex: 'fk_producto',
+        dataIndex: '  ',
         key: 'fk_producto',
     },
     {
@@ -39,7 +49,20 @@ const TablaSesionesProductos: React.FC = () => {
   }, []);
 
   return (
-    <Table dataSource={sesionesproductos} columns={columns} />
+    <>
+      <Button type="primary" onClick={showDrawer}>
+        Open
+      </Button>
+      <Table dataSource={sesionesproductos} columns={columns} />
+      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
+        <Form>
+          <Form.Item label="Cantidad"
+          name="cantidad"> 
+            <Input/>
+          </Form.Item>
+        </Form>
+      </Drawer>
+</>
   );
 }
 

@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { getGenero } from '../services/genero';
 import { Genero } from '../models/genero';
-import { Table } from "antd";
+import { Button, Drawer, Form, Input, Table } from "antd";
+import DrawerFooter from './DrawerFooter';
 
 const TablaGenero: React.FC = () => {
+  const [open, setOpen] = useState(false);
   const [genero, setGenero] = useState<Genero[]>([]);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
 
   const columns = [
     {
@@ -56,7 +66,24 @@ const TablaGenero: React.FC = () => {
   }, []);
 
   return (
-    <Table dataSource={genero} columns={columns} />
+    <>
+      <Button type="primary" onClick={showDrawer}>
+        Open
+      </Button>
+      <Table dataSource={genero} columns={columns} />
+      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
+        <Form>
+          <Form.Item label="ID del genero"
+          name="id_genero"> 
+            <Input/>
+          </Form.Item>
+          <Form.Item label="Genero del usuario"
+          name="genero"> 
+            <Input/>
+          </Form.Item>
+        </Form>
+      </Drawer>
+</>
   );
 }
 

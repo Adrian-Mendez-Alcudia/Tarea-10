@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { getUsuario } from '../services/usuarios';
-import { Usuario } from '../models/ususarios';
-import { Table } from "antd";
+import { Usuario } from '../models/usuarios';
+import { Button, Drawer, Form, Input, Table } from "antd";
+import DrawerFooter from './DrawerFooter';
 
 const TablaUsuarios: React.FC = () => {
+  const [open, setOpen] = useState(false);
   const [usuarios, setUsuario] = useState<Usuario[]>([]);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
 
   const columns = [
     {
@@ -55,7 +65,24 @@ const TablaUsuarios: React.FC = () => {
   }, []);
 
   return (
-    <Table dataSource={usuarios} columns={columns} />
+    <>
+      <Button type="primary" onClick={showDrawer}>
+        Open
+      </Button>
+      <Table dataSource={usuarios} columns={columns} />
+      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
+        <Form>
+          <Form.Item label="nombre de usuario"
+          name="nombre"> 
+            <Input/>
+          </Form.Item>
+          <Form.Item label="apellido de usuario"
+          name="apellido"> 
+            <Input/>
+          </Form.Item>
+        </Form>
+      </Drawer>
+</>
   );
 }
 

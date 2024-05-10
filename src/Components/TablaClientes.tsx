@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { getCliente } from '../services/clientes';
 import  Cliente  from '../models/clientes';
-import { Table } from "antd";
+import { Button, Drawer, Form, Input, Table } from "antd";
+import DrawerFooter from './DrawerFooter';
 
 const TablaClientes: React.FC = () => {
+  const [open, setOpen] = useState(false);
   const [clientes, setClientes] = useState<Cliente[]>([]);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
 
   const columns = [
     {
@@ -54,7 +64,24 @@ const TablaClientes: React.FC = () => {
   }, []);
 
   return (
-    <Table dataSource={clientes} columns={columns} />
+    <>
+      <Button type="primary" onClick={showDrawer}>
+        Open
+      </Button>
+      <Table dataSource={clientes} columns={columns} />
+      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
+        <Form>
+          <Form.Item label="Nombre del cliente"
+          name="nombre"> 
+            <Input/>
+          </Form.Item>
+          <Form.Item label="ID del cliente"
+          name="id_cliente"> 
+            <Input/>
+          </Form.Item>
+        </Form>
+      </Drawer>
+</>
   );
 }
 

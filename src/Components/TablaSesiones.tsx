@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { getSesion } from '../services/sesiones';
 import { Sesion } from '../models/sesiones';
-import { Table } from "antd";
+import { Button, Drawer, Form, Input, Table } from "antd";
+import DrawerFooter from './DrawerFooter';
 
 const TablaSesiones: React.FC = () => {
+  const [open, setOpen] = useState(false);
   const [sesion, setSesion] = useState<Sesion[]>([]);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
 
   const columns = [
     {
@@ -70,7 +80,24 @@ const TablaSesiones: React.FC = () => {
   }, []);
 
   return (
-    <Table dataSource={sesion} columns={columns} />
+    <>
+      <Button type="primary" onClick={showDrawer}>
+        Open
+      </Button>
+      <Table dataSource={sesion} columns={columns} />
+      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
+        <Form>
+          <Form.Item label="Fecha de la sesion"
+          name="fecha_sesion"> 
+            <Input/>
+          </Form.Item>
+          <Form.Item label="ID de la sesion"
+          name="id_sesion"> 
+            <Input/>
+          </Form.Item>
+        </Form>
+      </Drawer>
+</>
   );
 }
 

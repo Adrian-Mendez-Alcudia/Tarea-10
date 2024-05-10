@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { getDireccion } from '../services/direccion';
 import { Direccion } from '../models/direccion';
-import { Table } from "antd";
+import { Button, Drawer, Form, Input, Table } from "antd";
+import DrawerFooter from './DrawerFooter';
 
 const TablaDireccion: React.FC = () => {
+  const [open, setOpen] = useState(false);
   const [direccion, setDireccion] = useState<Direccion[]>([]);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
 
   const columns = [
     {
@@ -59,7 +69,24 @@ const TablaDireccion: React.FC = () => {
   }, []);
 
   return (
-    <Table dataSource={direccion} columns={columns} />
+    <>
+      <Button type="primary" onClick={showDrawer}>
+        Open
+      </Button>
+      <Table dataSource={direccion} columns={columns} />
+      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
+        <Form>
+          <Form.Item label="ID de la direccion"
+          name="id_direccion"> 
+            <Input/>
+          </Form.Item>
+          <Form.Item label="Codigo Postal (CP)"
+          name="codigopostal"> 
+            <Input/>
+          </Form.Item>
+        </Form>
+      </Drawer>
+</>
   );
 }
 

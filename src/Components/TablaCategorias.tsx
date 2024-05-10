@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import {getcategorias}from '../services/categorias'
 import Categorias from '../models/categorias';
-import { Table } from "antd";
+import { Button, Drawer, Form, Input, Table } from "antd";
+import DrawerFooter from './DrawerFooter';
 
 const TablaCategorias: React.FC =() => {
+  const [open, setOpen] = useState(false);
   const [categorias, setCategoria] = useState<Categorias[]>([]);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
 
   const columns = [
     {
@@ -63,7 +74,24 @@ const TablaCategorias: React.FC =() => {
 
   
   return (
-  <Table dataSource={categorias} columns={columns} />
+    <>
+      <Button type="primary" onClick={showDrawer}>
+        Open
+      </Button>
+      <Table dataSource={categorias} columns={columns} />
+      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
+        <Form>
+          <Form.Item label="Nombre de la categoria"
+          name="nombre"> 
+            <Input/>
+          </Form.Item>
+          <Form.Item label="ID de la categoria"
+          name="id_categoria"> 
+            <Input/>
+          </Form.Item>
+        </Form>
+      </Drawer>
+</>
   );
   
 }
