@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { getCliente } from '../services/clientes';
+import { createCliente, getCliente } from '../services/clientes';
 import  Cliente  from '../models/clientes';
-import { Button, Drawer, Form, Input, Table } from "antd";
+import type { DatePickerProps } from 'antd';
+import { Button, DatePicker, Drawer, Form, Input, Table } from "antd";
 import DrawerFooter from './DrawerFooter';
 
 const TablaClientes: React.FC = () => {
-  const [open, setOpen] = useState(false);
   const [clientes, setClientes] = useState<Cliente[]>([]);
-
-  const showDrawer = () => {
-    setOpen(true);
-  };
-
-  const onClose = () => {
-    setOpen(false);
-  };
-
+  const [open, setOpen] = useState(false);
+  const [nombre, setNombre] = useState<string>('');
+  const [apellido, setApellido] = useState<string>('');
+  const [fechaNacimiento, setfechaNacimiento] = useState<Date>(new Date());
+  
   const columns = [
     {
       title: 'ID Cliente',
@@ -53,8 +49,8 @@ const TablaClientes: React.FC = () => {
   useEffect(() => {
     const fetchClientes = async () => {
       try {
-        const clientes = await getCliente();
-        setClientes(clientes);
+        const fetchedClientes = await getCliente();
+        setClientes(fetchedClientes);
       } catch (error) {
         console.error("Error fetching clientes:", error);
       }
@@ -63,26 +59,67 @@ const TablaClientes: React.FC = () => {
     fetchClientes();
   }, []);
 
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const onChange: DatePickerProps['onChange'] = (date) => {
+    const selectedDate = new Date(date.year(), date.month() + 1, date.date());
+    setfechaNacimiento(selectedDate);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await createCliente({
+        nombre,
+        apellido,
+        fechaDeNacimiento: fechaNacimiento,
+        idCliente: 0,
+        fkGenero: 0,
+        telefono: '',
+        correo: '',
+        fkDireccion: 0,
+        fechaCreacion: null,
+        fechaActualizacion: null,
+        fkCreadoPor: 0,
+        fkActualizadoPor: 0,
+        fechaEliminacion: null,
+        fkEliminadoPor: null
+      });
+      const updatedClientes = await getCliente();
+      setClientes(updatedClientes);
+      onClose();
+    } catch (error) {
+      console.error("Error creando cliente:", error);
+    }
+  };
+
+
   return (
     <>
-      <Button type="primary" onClick={showDrawer}>
-        Open
-      </Button>
-      <Table dataSource={clientes} columns={columns} />
-      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
-        <Form>
-          <Form.Item label="Nombre del cliente"
-          name="nombre"> 
-            <Input/>
-          </Form.Item>
-          <Form.Item label="ID del cliente"
-          name="id_cliente"> 
-            <Input/>
-          </Form.Item>
-        </Form>
-      </Drawer>
-</>
-  );
+    <Button type="primary" onClick={showDrawer}>
+      Open
+    </Button>
+    <Table dataSource={clientes} columns={columns} />
+    <Drawer title="Agregar " onClose={onClose} visible={open} footer={<DrawerFooter createRecord={handleSubmit}/>}>
+      <Form>
+        <Form.Item label="Nombre" name="nombre"> 
+        <Input value={nombre} onChange={(e) => setNombre(e.target.value)} />
+        </Form.Item>
+        <Form.Item label="Apellido" name="apellido"> 
+        <Input value={apellido} onChange={(e) => setApellido(e.target.value)} />
+        </Form.Item>
+        <Form.Item label="Fecha Nacimiento" name="fecha_nacimiento"> 
+        <DatePicker onChange={onChange} />
+        </Form.Item>
+      </Form>
+    </Drawer>
+  </>
+);
 }
 
 export default TablaClientes;

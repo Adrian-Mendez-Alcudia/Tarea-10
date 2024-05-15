@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {getProducts}from '../services/product'
+import { createProducts, getProducts } from '../services/product';
+import type { InputNumberProps } from 'antd';
 import { Product } from '../models/product';
-import { Button, Drawer, Form, Input, Table } from "antd";
+import { Button, Drawer, Form, Input, InputNumber, Table } from "antd";
 import DrawerFooter from './DrawerFooter';
 
-const TablaProductos: React.FC =() => {
-  const [open, setOpen] = useState(false);
+const TablaProductos: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-
+  const [open, setOpen] = useState(false);
+  const [descripcion, setDescripcion] = useState<string>('');
+  const [precio, setPrecio] = useState<number>(0);
   const showDrawer = () => {
     setOpen(true);
   };
@@ -58,8 +60,8 @@ const TablaProductos: React.FC =() => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const products = await getProducts();
-        setProducts(products);
+        const fetchedProducts = await getProducts();
+        setProducts(fetchedProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -68,6 +70,33 @@ const TablaProductos: React.FC =() => {
     fetchProducts();
   }, []);
 
+  const onChange: InputNumberProps['onChange'] = (value) => {
+    if (value !== null && typeof value === 'number') {
+      setPrecio(value);
+    } else {
+      setPrecio(0);
+    }
+  };
+
+  const handleSubmit = async () => {
+    const randomID =  Math.floor(Math.random() * (5 - 1 + 1)) + 1;
+    try {
+      await createProducts({
+        precio,
+        ID_Producto: 0,
+        Nombre: '',
+        ID_Categoria: 0,
+        FechaCreacion: undefined,
+        Descripcion: ''
+      });
+      const updatedUsuarios = await getProducts();
+      setProducts(updatedUsuarios);
+      onClose();
+    } catch (error) {
+      console.error("Error creating usuario:", error);
+    }
+  };
+
   
   return (
     <>
@@ -75,21 +104,18 @@ const TablaProductos: React.FC =() => {
         Open
       </Button>
       <Table dataSource={products} columns={columns} />
-      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
+      <Drawer title="Agregar " onClose={onClose} visible={open} footer={<DrawerFooter createRecord={handleSubmit}/>}>
         <Form>
-          <Form.Item label="Nombre del producto"
-          name="product"> 
-            <Input/>
+          <Form.Item label="Descripcion" name="descripcion"> 
+          <Input value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
           </Form.Item>
-          <Form.Item label="Precio del producto"
-          name="precio_unitario"> 
-            <Input/>
+          <Form.Item label="Precio" name="precio"> 
+          <InputNumber addonAfter="$" value={precio} defaultValue={0} onChange={onChange}  />
           </Form.Item>
         </Form>
       </Drawer>
-</>
+    </>
   );
-  
 }
 
 export default TablaProductos;

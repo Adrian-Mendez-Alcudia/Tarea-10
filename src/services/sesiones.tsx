@@ -6,3 +6,7 @@ export const getSesion = async (): Promise<Sesion[]> => {
     if (error) throw error;
     return data
 }
+export const createSesion = async (sesion: Sesion ): Promise<void> => {
+    const { error} = await supabase.from("sesiones").insert(sesion);
+    if (error) throw error;
+}

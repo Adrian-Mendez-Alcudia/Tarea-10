@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { getGenero } from '../services/genero';
+import { createGenero, getGenero } from '../services/genero';
 import { Genero } from '../models/genero';
 import { Button, Drawer, Form, Input, Table } from "antd";
 import DrawerFooter from './DrawerFooter';
 
 const TablaGenero: React.FC = () => {
+  const [generos, setGeneros] = useState<Genero[]>([]);
   const [open, setOpen] = useState(false);
-  const [genero, setGenero] = useState<Genero[]>([]);
+  const [genero, setGenero] = useState<string>('');
 
   const showDrawer = () => {
     setOpen(true);
@@ -55,8 +56,8 @@ const TablaGenero: React.FC = () => {
   useEffect(() => {
     const fetchGenero = async () => {
       try {
-        const genero = await getGenero();
-        setGenero(genero);
+        const fetchedGenero = await getGenero();
+        setGeneros(fetchedGenero);
       } catch (error) {
         console.error("Error fetching genero:", error);
       }
@@ -65,25 +66,39 @@ const TablaGenero: React.FC = () => {
     fetchGenero();
   }, []);
 
+  const handleSubmit = async () => {
+    try {
+      await createGenero({
+        genero,
+        id_genero: 0,
+        fecha_creacion: undefined,
+        fecha_actualizacion: undefined,
+        fk_creado_por: 0,
+        fk_actualizado_por: 0
+      });
+      const updateGeneros = await getGenero();
+      setGeneros(updateGeneros);
+      onClose();
+    } catch (error) {
+      console.error("Error creating usuario:", error);
+    }
+  };
+
+
   return (
     <>
       <Button type="primary" onClick={showDrawer}>
         Open
       </Button>
-      <Table dataSource={genero} columns={columns} />
-      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
+      <Table dataSource={generos} columns={columns} />
+      <Drawer title="Agregar " onClose={onClose} visible={open} footer={<DrawerFooter createRecord={handleSubmit}/>}>
         <Form>
-          <Form.Item label="ID del genero"
-          name="id_genero"> 
-            <Input/>
-          </Form.Item>
-          <Form.Item label="Genero del usuario"
-          name="genero"> 
-            <Input/>
+          <Form.Item label="Genero" name="genero"> 
+          <Input value={genero} onChange={(e) => setGenero(e.target.value)} />
           </Form.Item>
         </Form>
       </Drawer>
-</>
+    </>
   );
 }
 

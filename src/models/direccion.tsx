@@ -6,8 +6,8 @@ export interface Direccion {
     num_ext: string;
     num_int: string;
     ciudad: string;
-    fecha_creacion: Date;
-    fecha_actualizado: Date;
+    fecha_creacion?: Date;
+    fecha_actualizado?: Date;
     fk_creado_por: number;
     fk_actualizado: number;
     fecha_eliminacion?: Date | null;

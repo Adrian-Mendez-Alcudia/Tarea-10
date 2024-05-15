@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { getDireccion } from '../services/direccion';
+import { createDireccion, getDireccion } from '../services/direccion';
 import { Direccion } from '../models/direccion';
-import { Button, Drawer, Form, Input, Table } from "antd";
+import { Button, Drawer, Form, Input, InputNumber, Table } from "antd";
 import DrawerFooter from './DrawerFooter';
 
 const TablaDireccion: React.FC = () => {
-  const [open, setOpen] = useState(false);
   const [direccion, setDireccion] = useState<Direccion[]>([]);
+  const [open, setOpen] = useState(false);
+  const [codigoPostal, setCodigoPostal] = useState<number>(0);
+  const [calle, setCalle] = useState<string>('');
+  const [colonia, setColonia] = useState<string>('');
+  const [ciudad, setCiudad] = useState<string>('');
+  const [numInt, setNumInt] = useState<string>('');
+  const [numExt, setNumExt] = useState<string>('');
+
 
   const showDrawer = () => {
     setOpen(true);
@@ -58,8 +65,8 @@ const TablaDireccion: React.FC = () => {
   useEffect(() => {
     const fetchDireccion = async () => {
       try {
-        const direccion = await getDireccion();
-        setDireccion(direccion);
+        const fetchedDireccion = await getDireccion();
+        setDireccion(fetchedDireccion);
       } catch (error) {
         console.error("Error fetching direccion:", error);
       }
@@ -68,25 +75,61 @@ const TablaDireccion: React.FC = () => {
     fetchDireccion();
   }, []);
 
+  const onChangeCodigoPostal = (value: number | null | undefined) => {
+    if (value !== null && value !== undefined) {
+      setCodigoPostal(value);
+    } else {
+      setCodigoPostal(0);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await createDireccion({
+        codigo_postal: codigoPostal,
+        calle,
+        colonia,
+        ciudad,
+        id_direccion: 0,
+        num_ext: '',
+        num_int: '',
+        fk_creado_por: 0,
+        fk_actualizado: 0,
+        fecha_creacion: undefined,
+        fecha_actualizado: undefined
+      });
+      const updatedDireccion = await getDireccion();
+      setDireccion(updatedDireccion);
+      onClose();
+    } catch (error) {
+      console.error("Error creating direccion:", error);
+    }
+  };
+
+
   return (
     <>
       <Button type="primary" onClick={showDrawer}>
         Open
       </Button>
       <Table dataSource={direccion} columns={columns} />
-      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
-        <Form>
-          <Form.Item label="ID de la direccion"
-          name="id_direccion"> 
-            <Input/>
+      <Drawer title="Agregar " onClose={onClose} visible={open} footer={<DrawerFooter createRecord={handleSubmit}/>}>
+        <Form onFinish={handleSubmit}>
+          <Form.Item label="Codigo Postal" name="codigo_postal">
+            <InputNumber defaultValue={codigoPostal} onChange={onChangeCodigoPostal} />
           </Form.Item>
-          <Form.Item label="Codigo Postal (CP)"
-          name="codigopostal"> 
-            <Input/>
+          <Form.Item label="Calle" name="calle">
+            <Input value={calle} onChange={(e) => setCalle(e.target.value)} />
+          </Form.Item>
+          <Form.Item label="Colonia" name="colonia">
+            <Input value={colonia} onChange={(e) => setColonia(e.target.value)} />
+          </Form.Item>
+          <Form.Item label="Ciudad" name="ciudad">
+            <Input value={ciudad} onChange={(e) => setCiudad(e.target.value)} />
           </Form.Item>
         </Form>
       </Drawer>
-</>
+    </>
   );
 }
 

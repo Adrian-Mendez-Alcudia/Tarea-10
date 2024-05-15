@@ -6,3 +6,7 @@ export const getDireccion = async (): Promise<Direccion[]> => {
     if (error) throw error;
     return data
 }
+export const createDireccion = async (direccion: Direccion): Promise<void> => {
+    const { error} = await supabase.from("direccion").insert(direccion);
+    if (error) throw error;
+}
