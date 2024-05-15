@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { getUsuario } from '../services/usuarios';
+import { getUsuario, createUsuario } from '../services/usuarios';
 import { Usuario } from '../models/usuarios';
 import { Button, Drawer, Form, Input, Table } from "antd";
 import DrawerFooter from './DrawerFooter';
 
 const TablaUsuarios: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const [usuarios, setUsuario] = useState<Usuario[]>([]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [nombre, setNombre] = useState<string>('');
+  const [apellido, setApellido] = useState<string>('');
 
   const showDrawer = () => {
     setOpen(true);
@@ -14,6 +16,24 @@ const TablaUsuarios: React.FC = () => {
 
   const onClose = () => {
     setOpen(false);
+  };
+
+  const handleSubmit = async () => {
+    const randomID =  Math.floor(Math.random() * (5 - 1 + 1)) + 1;
+    try {
+      await createUsuario({
+         nombre,
+         apellido,
+         fecha_creacion: new Date(),
+         fecha_actualizacion: new Date(),
+         fk_creado_por: randomID,
+         fk_actualizado_por: randomID,});
+      const updatedUsuarios = await getUsuario();
+      setUsuarios(updatedUsuarios);
+      onClose();
+    } catch (error) {
+      console.error("Error creating usuario:", error);
+    }
   };
 
   const columns = [
@@ -26,6 +46,11 @@ const TablaUsuarios: React.FC = () => {
         title: 'nombre',
         dataIndex: 'nombre',
         key: 'nombre',
+    },
+    {
+      title: 'Apellido',
+      dataIndex: 'apellido',
+      key: 'apellido',
     },
     {
         title: 'fecha_creacion',
@@ -55,7 +80,7 @@ const TablaUsuarios: React.FC = () => {
     const fetchUsuario = async () => {
       try {
         const usuarios = await getUsuario();
-        setUsuario(usuarios);
+        setUsuarios(usuarios);
       } catch (error) {
         console.error("Error fetching usuarios:", error);
       }
@@ -70,19 +95,17 @@ const TablaUsuarios: React.FC = () => {
         Open
       </Button>
       <Table dataSource={usuarios} columns={columns} />
-      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
-        <Form>
-          <Form.Item label="Nombre de usuario"
-          name="nombre"> 
-            <Input/>
+      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter createRecord={handleSubmit}/>}>
+      <Form>
+      <Form.Item label="Nombre del usuario" name="nombre">
+            <Input value={nombre} onChange={(e) => setNombre(e.target.value)} />
           </Form.Item>
-          <Form.Item label="Apellido de usuario"
-          name="apellido"> 
-            <Input/>
+          <Form.Item label="Apellido del usuario" name="apellido">
+            <Input value={apellido} onChange={(e) => setApellido(e.target.value)} />
           </Form.Item>
         </Form>
       </Drawer>
-</>
+    </>
   );
 }
 

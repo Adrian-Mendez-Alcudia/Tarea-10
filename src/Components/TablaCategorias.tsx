@@ -1,21 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {getcategorias}from '../services/categorias'
+import { createCategoria, getcategorias } from '../services/categorias';
 import Categorias from '../models/categorias';
 import { Button, Drawer, Form, Input, Table } from "antd";
 import DrawerFooter from './DrawerFooter';
 
-const TablaCategorias: React.FC =() => {
-  const [open, setOpen] = useState(false);
+const TablaCategorias: React.FC = () => {
   const [categorias, setCategoria] = useState<Categorias[]>([]);
-
-  const showDrawer = () => {
-    setOpen(true);
-  };
-
-  const onClose = () => {
-    setOpen(false);
-  };
-
+  const [open, setOpen] = useState(false);
+  const [nombre, setNombre] = useState<string>('');
 
   const columns = [
     {
@@ -53,17 +45,13 @@ const TablaCategorias: React.FC =() => {
         dataIndex: 'fk_actualizado',
         key: 'fk_actualizado',
     },
-
-
-
-
   ];
 
   useEffect(() => {
     const fetchCategoria = async () => {
       try {
-        const categorias = await getcategorias();
-        setCategoria(categorias);
+        const fetchedCategorias = await getcategorias();
+        setCategoria(fetchedCategorias);
       } catch (error) {
         console.error("Error fetching categorias:", error);
       }
@@ -72,28 +60,51 @@ const TablaCategorias: React.FC =() => {
     fetchCategoria();
   }, []);
 
-  
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const handleSubmit = async () => {
+    const randomID =  Math.floor(Math.random() * (5 - 1 + 1)) + 1;
+    try {
+      await createCategoria({
+        nombre,
+        fecha_creacion: new Date(),
+        fecha_actualizacion: new Date(),
+        fk_creado_por: randomID,
+        id_categoria: 0,
+        fk_actualizado: 0,
+        fecha_eliminacion: null,
+        fk_eliminado: null
+      });
+
+      const updatedUsuarios = await getcategorias();
+      setCategoria(updatedUsuarios);
+      onClose();
+    } catch (error) {
+      console.error("Error creating usuario:", error);
+    }
+  };
+
   return (
     <>
-      <Button type="primary" onClick={showDrawer}>
-        Open
-      </Button>
-      <Table dataSource={categorias} columns={columns} />
-      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
-        <Form>
-          <Form.Item label="Nombre de la categoria"
-          name="nombre"> 
-            <Input/>
-          </Form.Item>
-          <Form.Item label="ID de la categoria"
-          name="id_categoria"> 
-            <Input/>
-          </Form.Item>
-        </Form>
-      </Drawer>
-</>
-  );
-  
+    <Button type="primary" onClick={showDrawer}>
+      Open
+    </Button>
+    <Table dataSource={categorias} columns={columns} />
+    <Drawer title="Agregar Categoría" onClose={onClose} visible={open} footer={<DrawerFooter createRecord={handleSubmit}/>}>
+      <Form>
+        <Form.Item label="Nombre" name="nombre"> 
+        <Input value={nombre} onChange={(e) => setNombre(e.target.value)} />
+        </Form.Item>
+      </Form>
+    </Drawer>
+  </>
+);
 }
 
 export default TablaCategorias;

@@ -29,14 +29,11 @@ const App: React.FC = () => {
   const renderContent = () => {
         switch (selectedKey) {
       case '1':
-        return <TablaCategorias />;
-        break;
+        return <TablaCategorias />;break;
       case '2':
-        return <TablaClientes />;
-        break;
+        return <TablaClientes />;break;
       case '3':
-        return <TablaDireccion />;
-        break;
+        return <TablaDireccion />;break;
       case '4':
         return <TablaGenero />; break;
       case '5':
