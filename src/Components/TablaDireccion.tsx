@@ -11,9 +11,6 @@ const TablaDireccion: React.FC = () => {
   const [calle, setCalle] = useState<string>('');
   const [colonia, setColonia] = useState<string>('');
   const [ciudad, setCiudad] = useState<string>('');
-  const [numInt, setNumInt] = useState<string>('');
-  const [numExt, setNumExt] = useState<string>('');
-
 
   const showDrawer = () => {
     setOpen(true);
