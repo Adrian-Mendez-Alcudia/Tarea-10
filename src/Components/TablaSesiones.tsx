@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { getSesion } from '../services/sesiones';
+import { createSesion, getSesion } from '../services/sesiones';
 import { Sesion } from '../models/sesiones';
-import { Button, Drawer, Form, Input, Table } from "antd";
+import { Button, DatePicker, Drawer, Form, Table } from "antd";
 import DrawerFooter from './DrawerFooter';
+import moment from 'moment';
 
 const TablaSesiones: React.FC = () => {
-  const [open, setOpen] = useState(false);
   const [sesion, setSesion] = useState<Sesion[]>([]);
+  const [open, setOpen] = useState(false);
+  const [horaSesion, setHoraSesion] = useState<string>('');
 
   const showDrawer = () => {
     setOpen(true);
@@ -69,8 +71,8 @@ const TablaSesiones: React.FC = () => {
   useEffect(() => {
     const fetchSesion = async () => {
       try {
-        const sesion = await getSesion();
-        setSesion(sesion);
+        const data = await getSesion();
+        setSesion(data);
       } catch (error) {
         console.error("Error fetching sesion:", error);
       }
@@ -79,26 +81,44 @@ const TablaSesiones: React.FC = () => {
     fetchSesion();
   }, []);
 
+  const onChange = (time: string) => {
+    const formattedTime = moment(new Date(time)).format('HH:mm:ss');
+    setHoraSesion(formattedTime);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await createSesion({
+        hora_sesion: horaSesion,
+        id_sesion: 0,
+        fk_cliente: 0,
+        fk_creado_por: 0,
+        fk_actualizado_por: 0
+      }); // Llama a createUsuario con los datos del formulario
+      // Luego puedes volver a cargar la lista de usuarios para actualizar la tabla
+      const updateSesion = await getSesion();
+      setSesion(updateSesion);
+      onClose(); // Cierra el Drawer después de crear el usuario
+    } catch (error) {
+      console.error("Error creating usuario:", error);
+    }
+  };
+
+
   return (
     <>
       <Button type="primary" onClick={showDrawer}>
         Open
       </Button>
       <Table dataSource={sesion} columns={columns} />
-      <Drawer title="Agregar usuario" onClose={onClose} open={open} footer={<DrawerFooter/>}>
+      <Drawer title="Agregar hora_sesion " onClose={onClose} visible={open} footer={<DrawerFooter createRecord={handleSubmit}/>}>
         <Form>
-          <Form.Item label="Fecha de la sesion"
-          name="fecha_sesion"> 
-            <Input/>
-          </Form.Item>
-          <Form.Item label="ID de la sesion"
-          name="id_sesion"> 
-            <Input/>
+          <Form.Item label="Hora" name="hora_sesion"> 
+          <DatePicker picker={'time'} onChange={onChange} />
           </Form.Item>
         </Form>
       </Drawer>
-</>
+    </>
   );
 }
-
 export default TablaSesiones;

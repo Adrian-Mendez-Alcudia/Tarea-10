@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { createCliente, getCliente } from '../services/clientes';
-import  Cliente  from '../models/clientes';
+import { Cliente } from '../models/clientes';
 import type { DatePickerProps } from 'antd';
-import { Button, DatePicker, Drawer, Form, Input, Table } from "antd";
+import { Button, Drawer, Form, Input, Table, DatePicker } from "antd";
 import DrawerFooter from './DrawerFooter';
 
 const TablaClientes: React.FC = () => {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [Cliente, setCliente] = useState<Cliente[]>([]);
   const [open, setOpen] = useState(false);
   const [nombre, setNombre] = useState<string>('');
   const [apellido, setApellido] = useState<string>('');
-  const [fechaNacimiento, setfechaNacimiento] = useState<Date>(new Date());
+  const [Genero, setGenero] = useState<string>('');
+  const [fecha_de_nacimiento, setfecha_de_nacimiento] = useState<Date>(new Date());
   
   const columns = [
     {
@@ -24,7 +25,7 @@ const TablaClientes: React.FC = () => {
       key: 'nombre',
     },
     {
-      title: 'apellido',
+      title: 'Apellido',
       dataIndex: 'apellido',
       key: 'apellido',
     },
@@ -47,16 +48,16 @@ const TablaClientes: React.FC = () => {
   ];
 
   useEffect(() => {
-    const fetchClientes = async () => {
+    const fetchCliente = async () => {
       try {
-        const fetchedClientes = await getCliente();
-        setClientes(fetchedClientes);
+        const fetchedCliente = await getCliente();
+        setCliente(fetchedCliente);
       } catch (error) {
         console.error("Error fetching clientes:", error);
       }
     };
 
-    fetchClientes();
+    fetchCliente();
   }, []);
 
   const showDrawer = () => {
@@ -69,7 +70,7 @@ const TablaClientes: React.FC = () => {
 
   const onChange: DatePickerProps['onChange'] = (date) => {
     const selectedDate = new Date(date.year(), date.month() + 1, date.date());
-    setfechaNacimiento(selectedDate);
+    setfecha_de_nacimiento(selectedDate);
   };
 
   const handleSubmit = async () => {
@@ -77,21 +78,12 @@ const TablaClientes: React.FC = () => {
       await createCliente({
         nombre,
         apellido,
-        fechaDeNacimiento: fechaNacimiento,
-        idCliente: 0,
-        fkGenero: 0,
-        telefono: '',
-        correo: '',
-        fkDireccion: 0,
-        fechaCreacion: null,
-        fechaActualizacion: null,
-        fkCreadoPor: 0,
-        fkActualizadoPor: 0,
-        fechaEliminacion: null,
-        fkEliminadoPor: null
+        fecha_de_nacimiento: fecha_de_nacimiento,
+        id_cliente: 0,
+        fk_genero: 0
       });
-      const updatedClientes = await getCliente();
-      setClientes(updatedClientes);
+      const updatedCliente = await getCliente();
+      setCliente(updatedCliente);
       onClose();
     } catch (error) {
       console.error("Error creando cliente:", error);
@@ -104,8 +96,8 @@ const TablaClientes: React.FC = () => {
     <Button type="primary" onClick={showDrawer}>
       Open
     </Button>
-    <Table dataSource={clientes} columns={columns} />
-    <Drawer title="Agregar " onClose={onClose} visible={open} footer={<DrawerFooter createRecord={handleSubmit}/>}>
+    <Table dataSource={Cliente} columns={columns} />
+    <Drawer title="Agregar " onClose={onClose} open={open} footer={<DrawerFooter createRecord={handleSubmit}/>}>
       <Form>
         <Form.Item label="Nombre" name="nombre"> 
         <Input value={nombre} onChange={(e) => setNombre(e.target.value)} />
@@ -113,7 +105,11 @@ const TablaClientes: React.FC = () => {
         <Form.Item label="Apellido" name="apellido"> 
         <Input value={apellido} onChange={(e) => setApellido(e.target.value)} />
         </Form.Item>
-        <Form.Item label="Fecha Nacimiento" name="fecha_nacimiento"> 
+        <Form.Item label="genero" name="fk_genero"> 
+        <Input value={Genero} onChange={(e) => setGenero(e.target.value)} />
+        </Form.Item>
+
+        <Form.Item label="Fecha Nacimiento" name="fecha_de_nacimiento"> 
         <DatePicker onChange={onChange} />
         </Form.Item>
       </Form>
